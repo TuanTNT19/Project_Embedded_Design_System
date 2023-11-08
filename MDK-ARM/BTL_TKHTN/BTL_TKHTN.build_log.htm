@@ -22,124 +22,12 @@ Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
 G:\stm32project\BTL_TKHTN\MDK-ARM\BTL_TKHTN.uvprojx
-Project File Date:  11/07/2023
+Project File Date:  11/08/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'H:\KeiC\ARM\ARMCC\Bin'
 Build target 'BTL_TKHTN'
-assembling startup_stm32f103xb.s...
-compiling ADC.c...
-..\Lib\ADC.h(4): warning:  #1295-D: Deprecated declaration ADC1_Init - give arg types
-  void ADC1_Init();
-..\Lib\ADC.h(6): warning:  #1295-D: Deprecated declaration ADC1_Read - give arg types
-  uint16_t ADC1_Read();
-..\Lib\ADC.h(8): warning:  #1295-D: Deprecated declaration DMA_Init - give arg types
-  void DMA_Init();
-..\Lib\ADC.h(10): warning:  #1295-D: Deprecated declaration ADC2_Init - give arg types
-  void ADC2_Init();
-..\Lib\ADC.h(12): warning:  #1295-D: Deprecated declaration ADC2_Read - give arg types
-  uint16_t ADC2_Read();
-..\Lib\ADC.h(14): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Lib\ADC.c(148): warning:  #1-D: last line of file ends without a newline
-  	
-..\Lib\ADC.c: 7 warnings, 0 errors
-compiling GPIO.c...
-..\Lib\GPIO.h(5): warning:  #1295-D: Deprecated declaration GPIOA_Init - give arg types
-  void GPIOA_Init();
-..\Lib\GPIO.h(6): warning:  #1295-D: Deprecated declaration GPIOB_Init - give arg types
-  void GPIOB_Init();
-..\Lib\GPIO.h(7): warning:  #1295-D: Deprecated declaration GPIOC_Init - give arg types
-  void GPIOC_Init();
-..\Lib\GPIO.h(19): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Lib\GPIO.c: 4 warnings, 0 errors
-compiling PWM.c...
-..\Lib\PWM.h(4): warning:  #1295-D: Deprecated declaration TIM1_PWM_Init - give arg types
-  void TIM1_PWM_Init();
-..\Lib\PWM.h(8): warning:  #1295-D: Deprecated declaration TIM2_PWM_Init - give arg types
-  void TIM2_PWM_Init();
-..\Lib\PWM.h(11): warning:  #1295-D: Deprecated declaration TIM3_PWM_Init - give arg types
-  void TIM3_PWM_Init();
-..\Lib\PWM.h(15): warning:  #1295-D: Deprecated declaration TIM4_PWM_Init - give arg types
-  void TIM4_PWM_Init();
-..\Lib\PWM.h(21): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Lib\PWM.c(194): warning:  #61-D: integer operation result is out of range
-  	GPIOA->CRL |=(10<<28); //set gpioa pin 7 as output alternate function push pull for timer 3 channel 2
-..\Lib\PWM.c(194): warning:  #68-D: integer conversion resulted in a change of sign
-  	GPIOA->CRL |=(10<<28); //set gpioa pin 7 as output alternate function push pull for timer 3 channel 2
-..\Lib\PWM.c(253): warning:  #61-D: integer operation result is out of range
-  	      GPIOA->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c(260): warning:  #61-D: integer operation result is out of range
-  	      GPIOA->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c(270): warning:  #61-D: integer operation result is out of range
-  	      GPIOA->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c(306): warning:  #61-D: integer operation result is out of range
-  		GPIOB->CRL |=(10<<28);
-..\Lib\PWM.c(306): warning:  #68-D: integer conversion resulted in a change of sign
-  		GPIOB->CRL |=(10<<28);
-..\Lib\PWM.c(344): warning:  #61-D: integer operation result is out of range
-  	      GPIOB->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c(351): warning:  #61-D: integer operation result is out of range
-  	      GPIOB->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c(361): warning:  #61-D: integer operation result is out of range
-  	      GPIOB->CRL |=((10<<24) | (10<<28));
-..\Lib\PWM.c: 15 warnings, 0 errors
-compiling UART.c...
-..\Lib\UART.h(6): warning:  #1295-D: Deprecated declaration USART2_Init - give arg types
-  void USART2_Init();
-..\Lib\UART.h(11): warning:  #1295-D: Deprecated declaration USART3_Init - give arg types
-  void USART3_Init();
-..\Lib\UART.h(16): warning:  #1295-D: Deprecated declaration USART1_Init - give arg types
-  void USART1_Init();
-..\Lib\UART.h(21): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Lib\UART.c: 4 warnings, 0 errors
-compiling Timer.c...
-..\Lib\Timer.h(5): warning:  #1295-D: Deprecated declaration TIM2_config - give arg types
-  void TIM2_config();
-..\Lib\Timer.h(8): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Lib\Timer.c(22): warning:  #1-D: last line of file ends without a newline
-  }
-..\Lib\Timer.c: 3 warnings, 0 errors
-compiling main.c...
-../Core/Src/main.c(77): warning:  #1-D: last line of file ends without a newline
-  }
-../Core/Src/main.c: 1 warning, 0 errors
-compiling stm32f1xx_it.c...
-compiling stm32f1xx_hal_msp.c...
-compiling freertos.c...
-compiling stm32f1xx_hal_gpio_ex.c...
-compiling stm32f1xx_hal_timebase_tim.c...
-compiling stm32f1xx_hal.c...
-compiling stm32f1xx_hal_gpio.c...
-compiling stm32f1xx_hal_rcc_ex.c...
-compiling stm32f1xx_hal_rcc.c...
-compiling stm32f1xx_hal_pwr.c...
-compiling stm32f1xx_hal_cortex.c...
-compiling stm32f1xx_hal_dma.c...
-compiling stm32f1xx_hal_flash.c...
-compiling stm32f1xx_hal_flash_ex.c...
-compiling stm32f1xx_hal_exti.c...
-compiling system_stm32f1xx.c...
-compiling croutine.c...
-compiling event_groups.c...
-compiling stm32f1xx_hal_tim_ex.c...
-compiling list.c...
-compiling stream_buffer.c...
-compiling queue.c...
-compiling timers.c...
-compiling tasks.c...
-compiling stm32f1xx_hal_tim.c...
-compiling heap_4.c...
-compiling cmsis_os.c...
-compiling port.c...
-linking...
-Program Size: Code=3928 RO-data=308 RW-data=128 ZI-data=5008  
-FromELF: creating hex file...
-"BTL_TKHTN\BTL_TKHTN.axf" - 0 Error(s), 34 Warning(s).
+"BTL_TKHTN\BTL_TKHTN.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -162,7 +50,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-Build Time Elapsed:  00:00:21
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>
