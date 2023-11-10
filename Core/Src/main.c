@@ -11,29 +11,35 @@ TaskHandle_t ReadDHT22Handle;
 TaskHandle_t defaultTaskHandle;
 TaskHandle_t AboveNormalHandle;
 TaskHandle_t HighHandle;
+TaskHandle_t SendUartHandle;
 QueueHandle_t QueuexHandle;
 QueueHandle_t QueueyHandle;
+QueueHandle_t QueuetHandle;
 static void MX_I2C1_Init(void);
 void ReadDHT22(void *para);
 void StartDefaultTask(void  *argument);
 void AboveNormalTask (void *parameter);
 void HighTask(void *para2);
+void SendUartTask(void *para3);
 int i=0;
 int j=0;
 LiquidCrystal_I2C hlcd;
 uint8_t channel[2]={3,4};
 uint16_t adc_value[2];
 uint16_t data_receive[2];
-uint8_t temp,lumi;
+uint8_t temp,humi;
+uint8_t data_trans[2]={0};
 int main(void)
 {
   lcd_init(&hlcd, &hi2c1, LCD_ADDR_DEFAULT);
-  xTaskCreate(ReadDHT22,"Task 0",128,NULL,osPriorityAboveNormal+3,&ReadDHT22Handle);
-  xTaskCreate(StartDefaultTask, "Task00", 128, NULL, osPriorityAboveNormal, &defaultTaskHandle);
-  xTaskCreate(AboveNormalTask, "Task01", 128, NULL, osPriorityAboveNormal+1, &AboveNormalHandle);
-	xTaskCreate(HighTask, "Task01", 128, NULL, osPriorityAboveNormal+2, &HighHandle);
+  xTaskCreate(ReadDHT22,"Task 0",128,NULL,4,&ReadDHT22Handle);
+  xTaskCreate(StartDefaultTask, "Task00", 128, NULL, 1, &defaultTaskHandle);
+  xTaskCreate(AboveNormalTask, "Task01", 128, NULL, 2, &AboveNormalHandle);
+	xTaskCreate(HighTask, "Task01", 128, NULL, 3, &HighHandle);
+  xTaskCreate(SendUartTask,"Task1",128,NULL,0,&SendUartHandle);
 	QueuexHandle = xQueueCreate(1,2);
 	QueueyHandle = xQueueCreate(1,2);
+  QueuetHandle = xQueueCreate(2,1);
   ADC1_Config_Multi(2,channel);
 	DMA_Init();
 	TIM2_PWM_Init();
@@ -54,7 +60,10 @@ void ReadDHT22(void *para)
 {
   
    lcd_set_cursor(&hlcd, 0,0);
-	 lcd_printf(&hlcd, "Temp: %2d  Lumi: %2d",temp,lumi);
+	 lcd_printf(&hlcd, "Temp: %2d  Lumi: %2d",temp,humi);
+   xQueueSend(QueuetHandle,&temp,NULL);
+   xQueueSend(QueuetHandle,&humi,NULL);
+
 }
 void HighTask(void *para2)
 {
@@ -93,6 +102,18 @@ while(1)
 	
 }
   /* USER CODE END 5 */
+}
+void SendUartTask(void *para3){
+  while (1)
+  {
+     
+      xQueueReceive(QueuetHandle,&data_trans[0],osWaitForever);// get Temper from Queuet
+      xQueueReceive(QueuetHandle,&data_trans[1],osWaitForever);//get Humi from Queuet
+      /*
+      Transmit data by UART
+      */
+  
+}
 }
 
 
