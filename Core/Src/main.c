@@ -3,23 +3,32 @@
 #include "cmsis_os.h"
 #include "PWM.h"
 #include "Timer.h"
+#include "LiquidCrystal_I2C.h"
 #include "ADC.h"
+
+I2C_HandleTypeDef hi2c1;
+TaskHandle_t ReadDHT22Handle;
 TaskHandle_t defaultTaskHandle;
 TaskHandle_t AboveNormalHandle;
 TaskHandle_t HighHandle;
 QueueHandle_t QueuexHandle;
 QueueHandle_t QueueyHandle;
+static void MX_I2C1_Init(void);
+void ReadDHT22(void *para);
 void StartDefaultTask(void  *argument);
 void AboveNormalTask (void *parameter);
 void HighTask(void *para2);
 int i=0;
 int j=0;
+LiquidCrystal_I2C hlcd;
 uint8_t channel[2]={3,4};
 uint16_t adc_value[2];
 uint16_t data_receive[2];
+uint8_t temp,lumi;
 int main(void)
 {
- 
+  lcd_init(&hlcd, &hi2c1, LCD_ADDR_DEFAULT);
+  xTaskCreate(ReadDHT22,"Task 0",128,NULL,osPriorityAboveNormal+3,&ReadDHT22Handle);
   xTaskCreate(StartDefaultTask, "Task00", 128, NULL, osPriorityAboveNormal, &defaultTaskHandle);
   xTaskCreate(AboveNormalTask, "Task01", 128, NULL, osPriorityAboveNormal+1, &AboveNormalHandle);
 	xTaskCreate(HighTask, "Task01", 128, NULL, osPriorityAboveNormal+2, &HighHandle);
@@ -41,7 +50,12 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
+void ReadDHT22(void *para)
+{
+  
+   lcd_set_cursor(&hlcd, 0,0);
+	 lcd_printf(&hlcd, "Temp: %2d  Lumi: %2d",temp,lumi);
+}
 void HighTask(void *para2)
 {
 
