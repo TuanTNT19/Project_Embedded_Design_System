@@ -45,4 +45,5 @@ btl_tkhtn\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 btl_tkhtn\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 btl_tkhtn\main.o: ..\Lib\PWM.h
 btl_tkhtn\main.o: ..\Lib\Timer.h
+btl_tkhtn\main.o: ..\Lib\LiquidCrystal_I2C.h
 btl_tkhtn\main.o: ..\Lib\ADC.h

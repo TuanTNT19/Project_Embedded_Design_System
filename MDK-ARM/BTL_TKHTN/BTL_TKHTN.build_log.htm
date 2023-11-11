@@ -22,7 +22,7 @@ Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
 G:\stm32project\BTL_TKHTN\MDK-ARM\BTL_TKHTN.uvprojx
-Project File Date:  11/10/2023
+Project File Date:  11/11/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'H:\KeiC\ARM\ARMCC\Bin'
@@ -54,11 +54,11 @@ compiling main.c...
   uint16_t ADC2_Read();
 ..\Lib\ADC.h(14): warning:  #1-D: last line of file ends without a newline
   #endif
-../Core/Src/main.c(96): warning:  #1-D: last line of file ends without a newline
-  }
+../Core/Src/main.c(18): warning:  #177-D: function "MX_I2C1_Init"  was declared but never referenced
+  static void MX_I2C1_Init(void);
 ../Core/Src/main.c: 14 warnings, 0 errors
 linking...
-Program Size: Code=5928 RO-data=268 RW-data=148 ZI-data=5004  
+Program Size: Code=11048 RO-data=268 RW-data=164 ZI-data=5100  
 FromELF: creating hex file...
 "BTL_TKHTN\BTL_TKHTN.axf" - 0 Error(s), 14 Warning(s).
 
@@ -83,7 +83,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

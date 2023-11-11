@@ -43,7 +43,7 @@ int main(void)
   ADC1_Config_Multi(2,channel);
 	DMA_Init();
 	TIM2_PWM_Init();
-	TIM2_PWM_Config(1);
+	TIM2_PWM_Config(3);
 	TIM2_PWM_Config(2);
   osKernelStart();
 
@@ -83,7 +83,7 @@ void AboveNormalTask (void *parameter){
 	{
 		
    		 xQueueReceive(QueuexHandle,&data_receive[0],osWaitForever);
-		   uint8_t duty = data_receive[0]*999/4095;
+		   uint16_t duty = data_receive[0]*999/4095;
        TIM2_PWM_duty(2, duty);
 		
 	}
@@ -97,8 +97,8 @@ void StartDefaultTask(void  *argument)
 while(1)
 {
 			 xQueueReceive(QueueyHandle,&data_receive[1],osWaitForever);
-		   uint8_t duty = data_receive[1]*999/4095;
-       TIM2_PWM_duty(1, duty);
+		   uint16_t duty = data_receive[1]*999/4095;
+       TIM2_PWM_duty(3, duty);
 	
 }
   /* USER CODE END 5 */
