@@ -5,6 +5,7 @@
 #include "Timer.h"
 #include "LiquidCrystal_I2C.h"
 #include "ADC.h"
+#include "UART.h"
 
 I2C_HandleTypeDef hi2c1;
 TaskHandle_t ReadDHT22Handle;
@@ -23,12 +24,14 @@ void HighTask(void *para2);
 void SendUartTask(void *para3);
 int i=0;
 int j=0;
+uint8_t sta=0;
 LiquidCrystal_I2C hlcd;
 uint8_t channel[2]={3,4};
 uint16_t adc_value[2];
 uint16_t data_receive[2];
 uint8_t temp,humi;
 uint8_t data_trans[2]={0};
+char str[10];
 int main(void)
 {
   lcd_init(&hlcd, &hi2c1, LCD_ADDR_DEFAULT);
@@ -45,6 +48,12 @@ int main(void)
 	TIM2_PWM_Init();
 	TIM2_PWM_Config(3);
 	TIM2_PWM_Config(2);
+	USART1_Init();
+	USART1_Config(9600);
+	RCC->APB2ENR |= (1<<2);
+	GPIOA->CRH &=(0xFFF0FFFF);
+	GPIOA->CRH |=(8<<16);
+	GPIOA->ODR |=(1<<12);
   osKernelStart();
 
 
@@ -109,9 +118,32 @@ void SendUartTask(void *para3){
      
       xQueueReceive(QueuetHandle,&data_trans[0],osWaitForever);// get Temper from Queuet
       xQueueReceive(QueuetHandle,&data_trans[1],osWaitForever);//get Humi from Queuet
-      /*
-      Transmit data by UART
-      */
+		  if (!(GPIOA->IDR &(1<<12)))
+{
+  while (!(GPIOA->IDR &(1<<12)));
+   if (sta ==0)
+	 {
+		 sta=1;
+	 }
+	 else if (sta ==1)
+	 {
+		
+		 sta =0;
+	 }
+   
+}
+      
+      if (sta == 1)
+{
+       		 int len=sprintf(str,"%3d %3d\n",data_trans[0],data_trans[1]);
+		 USART1_Send_String((char *)str);
+              vTaskDelay(500);
+}
+else {
+        USART1_Send_String(NULL);
+        vTaskDelay(500);
+}
+      
   
 }
 }

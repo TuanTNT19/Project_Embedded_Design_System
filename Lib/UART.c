@@ -106,8 +106,8 @@ void USART1_Config(uint32_t baudr)
 	GPIOA->CRH &= (0xFFFFFF0F);
 	GPIOA-> CRH |= (10<<4);
 		// config gpioa pin 10 as alternative function RX
-	GPIOA->CRL &= (0xFFFFF0FF);
-	GPIOA->CRL |= (8<<8);//in push pull up/down
+	GPIOB->CRH &= (0xFFFFF0FF);
+	GPIOA->CRH |= (8<<8);//in push pull up/down
 	GPIOA->ODR |= (1<<10);// pull up
 	USART1->BRR = Cal_BRR(baudr);
 	USART1->CR1 |= (1<<13);

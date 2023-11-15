@@ -47,3 +47,4 @@ btl_tkhtn\main.o: ..\Lib\PWM.h
 btl_tkhtn\main.o: ..\Lib\Timer.h
 btl_tkhtn\main.o: ..\Lib\LiquidCrystal_I2C.h
 btl_tkhtn\main.o: ..\Lib\ADC.h
+btl_tkhtn\main.o: ..\Lib\UART.h
