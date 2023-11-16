@@ -115,7 +115,7 @@ void TIM2_PWM_Config(uint8_t channel)
 	RCC->APB2ENR |=(1<<2);//enable clock for GPIOA
 	if (channel == 1)
 	{
-	GPIOA->CRL &=(0xFFFF0000);
+	GPIOA->CRL &=(0xFFFFFFF0);
 	GPIOA->CRL |=(10<<0); //set gpioa pin 0 as output alternate function push pull for timer 2 channel 1
 	TIM2->CCER |=(1<<0);
 	TIM2->CCMR1 |=(6<<4);
@@ -123,7 +123,7 @@ void TIM2_PWM_Config(uint8_t channel)
 	}
 	else if (channel == 2)
 	{
-	GPIOA->CRL &=(0xFFFF0000);
+	GPIOA->CRL &=(0xFFFFFF0F);
 	GPIOA->CRL |=(10<<4);//set gpioa pin 1 as output alternate function push pull for timer 2 channel 2
 	TIM2->CCER |=(1<<4);
 	TIM2->CCMR1 |=(6<<12);
