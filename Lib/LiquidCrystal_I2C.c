@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "cmsis_os.h"
 #include "LiquidCrystal_I2C.h"
 static void lcd_send_cmd (LiquidCrystal_I2C *lcd, uint8_t cmd)
 {

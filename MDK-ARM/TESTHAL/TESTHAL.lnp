@@ -18,6 +18,7 @@
 "testhal\stm32f1xx_hal_flash.o"
 "testhal\stm32f1xx_hal_flash_ex.o"
 "testhal\stm32f1xx_hal_exti.o"
+"testhal\stm32f1xx_hal_i2c.o"
 "testhal\stm32f1xx_hal_tim.o"
 "testhal\stm32f1xx_hal_tim_ex.o"
 "testhal\stm32f1xx_hal_uart.o"
@@ -38,6 +39,7 @@
 "testhal\timer.o"
 "testhal\uart.o"
 "testhal\dht.o"
+"testhal\liquidcrystal_i2c.o"
 --library_type=microlib --strict --scatter "TESTHAL\TESTHAL.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

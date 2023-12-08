@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
+  ****************************************************************************
   * @file           : main.c
   * @brief          : Main program body
-  ******************************************************************************
+  ****************************************************************************
   * @attention
   *
   * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
@@ -14,7 +14,7 @@
   * License. You may obtain a copy of the License at:
   *                        opensource.org/licenses/BSD-3-Clause
   *
-  ******************************************************************************
+  ****************************************************************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -22,6 +22,7 @@
 #include "cmsis_os.h"
 #include "Timer.h"
 #include "dht.h"
+#include "LiquidCrystal_I2C.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -52,84 +53,29 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart1;
 
 osThreadId defaultTaskHandle;
+TaskHandle_t DHT_Handle;
+TaskHandle_t ADC_Handle;
+TaskHandle_t PWM_Handle;
+//TaskHandle_t UART_Handle;
+
+QueueHandle_t Queuex;
+QueueHandle_t Queuey;
+//QueueHandle_t Queuez;
 /* USER CODE BEGIN PV */
 uint8_t sta = 0;
-uint16_t adc_value[2];
-uint16_t data_receive[2];
+uint16_t adc_send[2];
+uint16_t adc_receive[2];
 char str[12] ;
 char str2 = NULL;
-uint8_t temp;
-uint8_t humi;
-float t;
-float h;
-uint8_t dht_data_receive[2];
-DHT dht;
-//void DHT22_Start(void){
-//	//GPIOA->BRR |= GPIO_PIN_8;
-//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,0);
-//	osDelay(20);
-////	GPIOA->BSRR |= GPIO_PIN_8;
-//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,1);
-//	TIM1->CNT = 0;
-//	while(TIM1->CNT < 55){
-//		if(!(GPIOA->IDR & (1<<8)))
-//			break;
-//	}
-//}
+float temp;
+int t;
+int h;
+float humi;
+float DHT_data[2];
+float UART_data[2];
 
-//uint8_t DHT22_checkResponse(void){
-//	uint8_t res = 0;
-//	TIM1->CNT = 0;
-//	while(TIM1->CNT < 90){
-//		if((GPIOA->IDR & (1<<8)) && (TIM1->CNT > 70)){
-//			res++;
-//			break;
-//		}
-//	}
 
-//	TIM1->CNT = 0;
-//	while(TIM1->CNT <95){
-//		if(!(GPIOA->IDR & (1<<8)) && (TIM1->CNT > 70)){
-//			res++;
-//			break;
-//		}
-//	}
-//	return res;
-//}
 
-//void DHT22_readData(float *temp, float *hum){
-//	uint8_t data[5];
-//	DHT22_Start();
-//	uint8_t check = DHT22_checkResponse();
-//	if(check == 2){
-//		for(int i = 0; i < 5; i++){
-//			for(int j = 7; j >= 0; j--){
-//				TIM1->CNT = 0;
-//        while(TIM1->CNT < 60){
-//          if((GPIOA->IDR & (1<<8)) && (TIM1->CNT > 40)){
-//            break;
-//          }
-//        }
-
-//        TIM1->CNT = 0;
-//        while(TIM1->CNT < 80){
-//          if(!(GPIOA->IDR & (1<<8))){
-//            break;
-//          }
-//        }
-//        if(TIM1->CNT > 50){
-//          data[i] |= (1<<j);
-//        }
-//        else
-//          data[i] &= ~(1<<j);
-//			}
-//		}
-//	}
-
-//	*temp = ((float)(data[2]&0x7F)*256 + (float)data[3])/10.0;
-//	*hum = ((float)data[0]*256 + (float)data[1])/10.0;
-
-//}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,6 +87,10 @@ static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
 void StartDefaultTask(void const * argument);
+void DHT_Task(void *para);
+void ADC_Task(void *para);
+void PWM_Task(void *para);
+void UART_Task(void *para);
 
 /* USER CODE BEGIN PFP */
 
@@ -148,7 +98,8 @@ void StartDefaultTask(void const * argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+LiquidCrystal_I2C hlcd;
+DHT dht;
 /* USER CODE END 0 */
 
 /**
@@ -185,9 +136,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-//	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
-  //HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
 	TIM1_config();
+	lcd_init(&hlcd, &hi2c1, LCD_ADDR_DEFAULT);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -210,6 +162,13 @@ int main(void)
   /* definition and creation of defaultTask */
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	//xTaskCreate(UART_Task, "Task_UART", 128, NULL,1,&UART_Handle);
+	xTaskCreate(DHT_Task, "Task DHT", 128, NULL, 2, &DHT_Handle);
+	xTaskCreate(ADC_Task, "Task_ADC", 128, NULL, 4, &ADC_Handle);
+	xTaskCreate(PWM_Task, "Task_PWM", 128, NULL, 3, &PWM_Handle);
+	Queuex = xQueueCreate(2,4);
+	Queuey = xQueueCreate(2,2);
+	//Queuez = xQueueCreate(2,4);
   DHT_Init(&dht,GPIOA,8);
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -517,52 +476,43 @@ static void MX_GPIO_Init(void)
 //	}
 //	
 //}
-//void Task2(void *para2)
+//void UART_Task(void *para)
 //{
 //	
 //   while(1)
 //	 {
-//		 xQueueReceive(Queuey,&dht_data_receive[0],osWaitForever);
-//		 xQueueReceive(Queuey,&dht_data_receive[1],osWaitForever);
-//		 sprintf(str,"%4d %4d ",dht_data_receive[0],dht_data_receive[1]);
-//		 if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0){
-//			 while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0);
-//			 if (sta == 0)
-//			 {
-//				 sta = 1;
-//			 }
-//			 else if (sta == 1)
-//			 {
-//				 sta = 0;
-//			 }
-//		 }
-//			 if (sta == 1)
-//			 {
-//					HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
-//           vTaskDelay(1000);
-//			 }
-//       else {
-//				 HAL_UART_Transmit(&huart1,NULL,sizeof(NULL), 100);
-//           vTaskDelay(1000);
-//			 }
-//				 
+////		 xQueueReceive(Queuez,&UART_data[0],osWaitForever);
+////		 xQueueReceive(Queuez,&UART_data[1],osWaitForever);
+////		 vTaskDelay(100);
+//		 HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+//		 vTaskDelay(500);
+////		 sprintf(str,"%4f %4f ",UART_data[0],UART_data[1]);
+////		 if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0){
+////			 while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0);
+////			 if (sta == 0)
+////			 {
+////				 sta = 1;
+////			 }
+////			 else if (sta == 1)
+////			 {
+////				 sta = 0;
+////			 }
+////		 }
+////			 if (sta == 1)
+////			 {
+////					HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
+////           vTaskDelay(1000);
+////			 }
+////       else {
+////				 HAL_UART_Transmit(&huart1,NULL,sizeof(NULL), 100);
+////           vTaskDelay(1000);
+////			 }
+////				 
 //			 
 //		 
 //	 }
 //}
-//void Task3(void *para3)
-//{
-//	
-//	while(1)
-//	{
-//		//Read data by DHT22
-//		//Send data by Queue
-//		xQueueSend(Queuey,&temp,NULL);
-//		xQueueSend(Queuey,&humi,NULL);
-//		vTaskDelay(500);
-//	}
-//	
-//}
+
 
 
 /* USER CODE END 4 */
@@ -574,6 +524,53 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
+void ADC_Task(void *para)
+{
+	while(1)
+	{
+		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adc_send,2);
+		xQueueSend(Queuey, &adc_send[0], NULL);
+		xQueueSend(Queuey, &adc_send[1], NULL);
+		vTaskDelay(100);
+		
+	}
+}
+
+void PWM_Task(void *para)
+{
+	while(1)
+	{
+		xQueueReceive(Queuey,&adc_receive[0],osWaitForever);
+		xQueueReceive(Queuey,&adc_receive[1],osWaitForever);
+		uint16_t duty0 = adc_receive[0]*999/4095;
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty0);
+			uint16_t duty1 = adc_receive[1]*999/4095;
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_3,duty1);
+		vTaskDelay(100);
+	}
+	
+}
+
+void DHT_Task(void *para)
+{
+	while(1){
+		DHT22_readData(&dht);
+		temp = dht.temperature;
+		humi = dht.humility;
+		xQueueSend(Queuex, &temp, NULL);
+		xQueueSend(Queuex, &humi, NULL);
+		h = (int)humi;
+		t = (int)temp;
+	  int len = sprintf(str,"%4d %4d\n",t,h);
+		HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
+	//	xQueueSend(Queuez, &temp, NULL);
+		//xQueueSend(Queuez, &humi, NULL);
+		vTaskDelay(1000);
+		
+	}
+	
+}
+
 void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
@@ -592,7 +589,14 @@ void StartDefaultTask(void const * argument)
 		//__disable_irq();
 	//	DHT22_readData(&t, &h);
 		//__enable_irq();
-		DHT22_readData(&dht);
+//		DHT22_readData(&dht);
+//		vTaskDelay(1000);
+		xQueueReceive(Queuex,&DHT_data[0],osWaitForever);
+		xQueueReceive(Queuex,&DHT_data[1],osWaitForever);
+		lcd_set_cursor(&hlcd, 0,0);
+		lcd_printf(&hlcd, "temp : %4f ",DHT_data[0]);
+		lcd_set_cursor(&hlcd, 1,0);
+		lcd_printf(&hlcd, "humi : %4f ",DHT_data[1]);
 		vTaskDelay(1000);
   }
   /* USER CODE END 5 */

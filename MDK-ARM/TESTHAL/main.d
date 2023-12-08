@@ -45,3 +45,6 @@ testhal\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 testhal\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 testhal\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 testhal\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+testhal\main.o: ..\Lib\Timer.h
+testhal\main.o: ..\Lib\dht.h
+testhal\main.o: ..\Lib\LiquidCrystal_I2C.h
