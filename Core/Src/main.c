@@ -52,15 +52,14 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 
-osThreadId defaultTaskHandle;
+osThreadId defaultTaskHandle;//LCD Handle
 TaskHandle_t DHT_Handle;
 TaskHandle_t ADC_Handle;
 TaskHandle_t PWM_Handle;
-//TaskHandle_t UART_Handle;
 
 QueueHandle_t Queuex;
 QueueHandle_t Queuey;
-//QueueHandle_t Queuez;
+
 /* USER CODE BEGIN PV */
 uint8_t sta = 0;
 uint16_t adc_send[2];
@@ -86,7 +85,7 @@ static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
-void StartDefaultTask(void const * argument);
+void StartDefaultTask(void const * argument);//LCD Test
 void DHT_Task(void *para);
 void ADC_Task(void *para);
 void PWM_Task(void *para);
@@ -168,7 +167,7 @@ int main(void)
 	xTaskCreate(PWM_Task, "Task_PWM", 128, NULL, 3, &PWM_Handle);
 	Queuex = xQueueCreate(2,4);
 	Queuey = xQueueCreate(2,2);
-	//Queuez = xQueueCreate(2,4);
+
   DHT_Init(&dht,GPIOA,8);
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -464,56 +463,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-//void Task1(void *para1){
-//	
-//	while(1)
-//	{
-//		  HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adc_value,2);
-//		xQueueSend(Queuex,&adc_value[0],NULL);
-//		xQueueSend(Queuex,&adc_value[1],NULL);
-//	
-//		vTaskDelay(100);
-//	}
-//	
-//}
-//void UART_Task(void *para)
-//{
-//	
-//   while(1)
-//	 {
-////		 xQueueReceive(Queuez,&UART_data[0],osWaitForever);
-////		 xQueueReceive(Queuez,&UART_data[1],osWaitForever);
-////		 vTaskDelay(100);
-//		 HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-//		 vTaskDelay(500);
-////		 sprintf(str,"%4f %4f ",UART_data[0],UART_data[1]);
-////		 if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0){
-////			 while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0);
-////			 if (sta == 0)
-////			 {
-////				 sta = 1;
-////			 }
-////			 else if (sta == 1)
-////			 {
-////				 sta = 0;
-////			 }
-////		 }
-////			 if (sta == 1)
-////			 {
-////					HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
-////           vTaskDelay(1000);
-////			 }
-////       else {
-////				 HAL_UART_Transmit(&huart1,NULL,sizeof(NULL), 100);
-////           vTaskDelay(1000);
-////			 }
-////				 
-//			 
-//		 
-//	 }
-//}
-
-
 
 /* USER CODE END 4 */
 
@@ -529,8 +478,8 @@ void ADC_Task(void *para)
 	while(1)
 	{
 		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adc_send,2);
-		xQueueSend(Queuey, &adc_send[0], NULL);
-		xQueueSend(Queuey, &adc_send[1], NULL);
+		xQueueSend(Queuey, &adc_send[0], NULL);//gt bien tro
+		xQueueSend(Queuey, &adc_send[1], NULL);// gt quang tro
 		vTaskDelay(100);
 		
 	}
@@ -543,9 +492,9 @@ void PWM_Task(void *para)
 		xQueueReceive(Queuey,&adc_receive[0],osWaitForever);
 		xQueueReceive(Queuey,&adc_receive[1],osWaitForever);
 		uint16_t duty0 = adc_receive[0]*999/4095;
-		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty0);
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty0);//set toc do cho dong co
 			uint16_t duty1 = adc_receive[1]*999/4095;
-		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_3,duty1);
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_3,duty1);//set do sang cho den
 		vTaskDelay(100);
 	}
 	
@@ -565,7 +514,7 @@ void DHT_Task(void *para)
 		HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
 	//	xQueueSend(Queuez, &temp, NULL);
 		//xQueueSend(Queuez, &humi, NULL);
-		vTaskDelay(1000);
+		vTaskDelay(500);
 		
 	}
 	
@@ -578,26 +527,14 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-//		xQueueReceive(Queuex,&data_receive[0],osWaitForever);
-//		xQueueReceive(Queuex,&data_receive[1],osWaitForever);
-//		uint16_t duty = data_receive[0]*999/4095;
-//		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty);
-//    	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adc_value,2);
-//		vTaskDelay(500);
-   // osDelay(1);
-		//__disable_irq();
-	//	DHT22_readData(&t, &h);
-		//__enable_irq();
-//		DHT22_readData(&dht);
-//		vTaskDelay(1000);
+
 		xQueueReceive(Queuex,&DHT_data[0],osWaitForever);
 		xQueueReceive(Queuex,&DHT_data[1],osWaitForever);
 		lcd_set_cursor(&hlcd, 0,0);
 		lcd_printf(&hlcd, "temp : %4f ",DHT_data[0]);
 		lcd_set_cursor(&hlcd, 1,0);
 		lcd_printf(&hlcd, "humi : %4f ",DHT_data[1]);
-		vTaskDelay(1000);
+		vTaskDelay(500);
   }
   /* USER CODE END 5 */
 }
