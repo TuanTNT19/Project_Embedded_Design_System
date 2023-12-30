@@ -52,8 +52,8 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 
-osThreadId defaultTaskHandle;//LCD Handle
-TaskHandle_t DHT_Handle;
+TaskHandle_t LCD_I2C_Handle;
+TaskHandle_t DHT_UART_Handle;
 TaskHandle_t ADC_Handle;
 TaskHandle_t PWM_Handle;
 
@@ -85,11 +85,11 @@ static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
-void StartDefaultTask(void const * argument);//LCD Test
-void DHT_Task(void *para);
+void LCD_I2C_Task(void *para);
+void DHT_UART_Task(void *para);
 void ADC_Task(void *para);
 void PWM_Task(void *para);
-void UART_Task(void *para);
+
 
 /* USER CODE BEGIN PFP */
 
@@ -159,10 +159,8 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
-	//xTaskCreate(UART_Task, "Task_UART", 128, NULL,1,&UART_Handle);
-	xTaskCreate(DHT_Task, "Task DHT", 128, NULL, 2, &DHT_Handle);
+  xTaskCreate(LCD_I2C_Task, "Task LCD_I2C", 128, NULL, 1, &LCD_I2C_Handle);
+	xTaskCreate(DHT_UART_Task, "Task DHT", 128, NULL, 2, &DHT_UART_Handle);
 	xTaskCreate(ADC_Task, "Task_ADC", 128, NULL, 4, &ADC_Handle);
 	xTaskCreate(PWM_Task, "Task_PWM", 128, NULL, 3, &PWM_Handle);
 	Queuex = xQueueCreate(2,4);
@@ -492,15 +490,15 @@ void PWM_Task(void *para)
 		xQueueReceive(Queuey,&adc_receive[0],osWaitForever);
 		xQueueReceive(Queuey,&adc_receive[1],osWaitForever);
 		uint16_t duty0 = adc_receive[0]*999/4095;
-		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty0);//set toc do cho dong co
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_2,duty0);//set do sang cho den
 			uint16_t duty1 = adc_receive[1]*999/4095;
-		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_3,duty1);//set do sang cho den
+		__HAL_TIM_SetCompare (&htim2,TIM_CHANNEL_3,duty1);//set toc do cho dong co
 		vTaskDelay(100);
 	}
 	
 }
 
-void DHT_Task(void *para)
+void DHT_UART_Task(void *para)
 {
 	while(1){
 		DHT22_readData(&dht);
@@ -520,13 +518,11 @@ void DHT_Task(void *para)
 	
 }
 
-void StartDefaultTask(void const * argument)
+void LCD_I2C_Task(void *para)
 {
-  /* USER CODE BEGIN 5 */
-	
-  /* Infinite loop */
-  for(;;)
-  {
+
+  while(1)
+		{
 
 		xQueueReceive(Queuex,&DHT_data[0],osWaitForever);
 		xQueueReceive(Queuex,&DHT_data[1],osWaitForever);
@@ -536,7 +532,7 @@ void StartDefaultTask(void const * argument)
 		lcd_printf(&hlcd, "humi : %4f ",DHT_data[1]);
 		vTaskDelay(500);
   }
-  /* USER CODE END 5 */
+  
 }
 
 /**
