@@ -65,6 +65,7 @@ uint8_t sta = 0;
 uint16_t adc_send[2];
 uint16_t adc_receive[2];
 char str[50] ;
+char str2 = NULL;
 float temp;
 float humi;
 float DHT_data[2];
@@ -134,7 +135,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-	TIM1_config();
+	TIM1_Configure(7,0xFFFF);
 	lcd_init(&hlcd, &hi2c1, LCD_ADDR_DEFAULT);
   /* USER CODE END 2 */
 
@@ -506,7 +507,26 @@ void DHT_UART_Task(void *para)
 		//h = (int)humi;
 		//t = (int)temp;
 	  int len = sprintf(str,"Temperature: %.2f\nHuminity: %.2f\n",temp,humi);
+		if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9)==0)
+		{
+			while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9)==0);
+			 if (sta == 0)
+			 {
+				 sta = 1;
+			 }
+			 else if (sta == 1)
+			 {
+				 sta = 0;
+			 }
+		}
+		
+		if (sta == 1){
 		HAL_UART_Transmit(&huart1,(uint8_t *)str,sizeof(str), 100);
+		}
+		else if (sta == 0)
+		{
+			HAL_UART_Transmit(&huart1,(uint8_t *)str2,sizeof(str2), 100);
+		}
 	//	xQueueSend(Queuez, &temp, NULL);
 		//xQueueSend(Queuez, &humi, NULL);
 		vTaskDelay(500);
